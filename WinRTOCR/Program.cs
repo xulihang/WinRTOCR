@@ -15,26 +15,58 @@ namespace WinRTOCR
     {
         static async Task Main(string[] args)
         {
+
             String imagePath="image.jpg";
-            String lang = "zh-Hans";
+            String lang = Language.CurrentInputMethodLanguageTag;
             String output = "out.json";
             if (args.Length != 0)
             {
+                foreach (String arg in args)
+                {
+                    if (arg == "-h")
+                    {
+                        Help();
+                    }
+                    else if (arg == "-l")
+                    {
+                        SupportedLanguages();          
+                    }
+                }
                 imagePath = args[0];
                 if (args.Length == 3)
                 {
                     lang = args[1];
                     output = args[2];
+                }else
+                {
+                    Console.WriteLine("Using input method language:" + lang);
+                    Console.WriteLine("Using default output path:" + output);
                 }
+            }
+            else
+            {
+                Console.WriteLine("Using default image path:" + imagePath);
+                Console.WriteLine("Using input method language:" + lang);
+                Console.WriteLine("Using default output path:" + output);
             }
             if (System.IO.File.Exists(imagePath))
             {
-                await Write(imagePath, lang, output);
+                try
+                {
+                    await Write(imagePath, lang, output);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }              
+                
             }
             else
             {
                 Console.WriteLine("Bad path");
+                Help();
             }
+            //Console.ReadLine();
             //Print(imagePath,lang);
             
         }
@@ -49,6 +81,7 @@ namespace WinRTOCR
             SoftwareBitmap bitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
             Language language = new Language(lang);
             OcrEngine ocrEngine = OcrEngine.TryCreateFromLanguage(language);
+            
             OcrResult ocrResult = await ocrEngine.RecognizeAsync(bitmap);
             Console.Write(ocrResult.Text);
             return ocrResult;
@@ -71,5 +104,24 @@ namespace WinRTOCR
             streamWriter.Dispose();
             return "";
         }
+
+        private static void SupportedLanguages()
+        {
+            Console.WriteLine("Supported languages:");
+            foreach (Language lang in OcrEngine.AvailableRecognizerLanguages)
+            {
+                Console.WriteLine(lang.LanguageTag);       
+            }
+            Environment.Exit(0);
+        }
+        private static void Help()
+        {
+            Console.WriteLine("Usage: WinRTOCR.exe imagePath language outputPath");
+            Console.WriteLine("-h: Show this help");
+            Console.WriteLine("-l: Show supported languages");
+            Environment.Exit(0);
+        }
+
+
     }
 }
