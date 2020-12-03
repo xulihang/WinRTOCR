@@ -26,7 +26,7 @@ namespace WinRTOCR
                     if (arg == "-h")
                     {
                         Help();
-                    }
+                    }  
                     else if (arg == "-l")
                     {
                         SupportedLanguages();          
@@ -107,9 +107,10 @@ namespace WinRTOCR
 
         private static void SupportedLanguages()
         {
-            Console.WriteLine("Supported languages:");
+            //Console.WriteLine("Supported languages:");
             foreach (Language lang in OcrEngine.AvailableRecognizerLanguages)
             {
+                Console.WriteLine(lang.DisplayName);
                 Console.WriteLine(lang.LanguageTag);       
             }
             Environment.Exit(0);
