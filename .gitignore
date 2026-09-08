@@ -1,0 +1,8 @@
+## NuGet / build outputs
+bin/
+obj/
+packages/
+
+## Visual Studio
+.vs/
+*.user
